@@ -4,98 +4,57 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CRM • Prospectos</title>
+
   <link rel="icon" type="image/x-icon" href="./favicon.ico" />
-  <base href="./">
+  <!-- CSS na RAIZ -->
+  <link rel="stylesheet" href="./index-DYx4jXYy.css" />
+
   <style>
     html,body{height:100%} body{margin:0}
     #root{min-height:100%; display:flex; align-items:center; justify-content:center;
           font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; color:#333}
-    .msg{padding:16px; border:1px solid #ddd; background:#fafafa; border-radius:8px}
+    .msg{padding:16px;border:1px solid #ddd;background:#fafafa;border-radius:8px}
     .err{border-color:#e99;background:#fff5f5;color:#a00}
-    .ok{border-color:#9c9;background:#f6fff6;color:#070}
-    code{background:#eee;border-radius:4px;padding:2px 6px}
   </style>
-
-  <!-- CSS: tentamos carregar e mostramos status na tela -->
-  <script>
-    (function(){
-      const cssUrl = './index-DYx4jXYy.css?v=' + Date.now();
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = cssUrl;
-      link.onload = () => console.log('[CSS] ok ->', cssUrl);
-      link.onerror = () => {
-        const r = document.getElementById('root') || document.body.appendChild(Object.assign(document.createElement('div'),{id:'root'}));
-        r.innerHTML =
-          '<div class="msg err">Não consegui carregar o CSS em <code>'+cssUrl+
-          '</code> (404?). Confirme o <b>nome exato</b> do arquivo no repositório.</div>';
-        console.error('[CSS] erro ao carregar', cssUrl);
-      };
-      document.head.appendChild(link);
-    })();
-  </script>
 </head>
 <body>
-  <div id="root">Carregando…</div>
+  <!-- contêiner que o bundle deve usar -->
+  <div id="root"><div class="msg">Carregando…</div></div>
 
-  <!-- Logs globais úteis -->
   <script>
+    // Garante que #root exista e esteja vazio antes do bundle montar (evita React #299)
+    (function ensureRoot(){
+      var r = document.getElementById('root');
+      if (!r){ r = document.createElement('div'); r.id='root'; document.body.appendChild(r); }
+      r.innerHTML = '';
+    })();
+
+    // Carrega o bundle JS da RAIZ (sem module). Se o bundle for ESM, veremos o erro no console.
+    (function loadBundle(){
+      var s = document.createElement('script');
+      s.src = './index-CFG82D6X.js?v=' + Date.now();
+      s.defer = true;
+      s.onload = function(){ console.log('[ok] bundle carregado'); };
+      s.onerror = function(){
+        var r = document.getElementById('root');
+        r.innerHTML = '<div class="msg err">Não consegui carregar <code>'+s.src+
+                      '</code> (404?). Confirme o <b>nome/caminho</b> do arquivo.</div>';
+        console.error('[erro] ao carregar script', s.src);
+      };
+      document.body.appendChild(s);
+    })();
+
+    // Mostra erros na tela também
     window.addEventListener('error', e => {
-      console.error('[window.error]', e.message, e.filename, e.lineno, e);
-      const r = document.getElementById('root'); 
-      r.innerHTML = '<div class="msg err"><b>Erro:</b> '+(e.message||e)+'</div>';
+      console.error('[window.error]', e.message);
+      document.getElementById('root').innerHTML =
+        '<div class="msg err"><b>Erro:</b> '+(e.message||e)+'</div>';
     });
     window.addEventListener('unhandledrejection', e => {
       console.error('[unhandledrejection]', e.reason);
-      const r = document.getElementById('root'); 
-      r.innerHTML = '<div class="msg err"><b>Promise rejeitada:</b> '+(e.reason&&e.reason.message?e.reason.message:e.reason)+'</div>';
+      document.getElementById('root').innerHTML =
+        '<div class="msg err"><b>Promise rejeitada:</b> '+(e.reason&&e.reason.message?e.reason.message:e.reason)+'</div>';
     });
-  </script>
-
-  <!-- Garante container e dá fallback se o bundle procurar outro id -->
-  <script>
-    (function ensureMountPoint(){
-      var r = document.getElementById('root');
-      if (!r){ r = document.createElement('div'); r.id='root'; document.body.appendChild(r); }
-      r.innerHTML = ''; // React 18 exige vazio
-
-      const _get = Document.prototype.getElementById;
-      Document.prototype.getElementById = function(id){
-        const el = _get.call(this, id);
-        return el || _get.call(this, 'root') || _get.call(this, 'app') || _get.call(this, 'manus-root');
-      };
-    })();
-  </script>
-
-  <!-- Importa o bundle JS e mostra status -->
-  <script type="module">
-    (async function(){
-      const jsUrl = './index-CFG82D6X.js?v=' + Date.now();
-      console.log('[JS] tentando importar', jsUrl);
-
-      // checa se existe antes (para diagnosticar 404)
-      try {
-        const head = await fetch(jsUrl, { method:'HEAD', cache:'no-store' });
-        console.log('[JS] HEAD status', head.status);
-        if (!head.ok) {
-          document.getElementById('root').innerHTML =
-            '<div class="msg err">Não consegui carregar o JS em <code>'+jsUrl+
-            '</code> (status '+head.status+'). Verifique o <b>nome exato</b> do arquivo e o caminho.</div>';
-          return;
-        }
-      } catch (e) {
-        console.error('[JS] HEAD falhou', e);
-      }
-
-      try {
-        await import(jsUrl);
-        console.log('[JS] import ok');
-      } catch (e) {
-        console.error('[JS] import falhou', e);
-        document.getElementById('root').innerHTML =
-          '<div class="msg err"><b>Falha ao importar o bundle:</b> '+(e.message||e)+'</div>';
-      }
-    })();
   </script>
 </body>
 </html>
