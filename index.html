@@ -1,14 +1,29 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Análise de Prospecção - Nutricionistas</title>
-    <script type="module" crossorigin src="/assets/index-CFG82D6X.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DYx4jXYy.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
-</html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CRM • Prospectos</title>
+
+  <!-- favicon (opcional, só se existir na raiz) -->
+  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+
+  <!-- CSS na raiz (nome exato do seu arquivo) -->
+  <link rel="stylesheet" href="./index-DYx4jXYy.css" />
+</head>
+<body>
+  <!-- container que o bundle deve usar -->
+  <div id="root"></div>
+
+  <!-- polyfills simples para ambientes estáticos -->
+  <script>
+    window.global = window.global || window;
+    window.process = window.process || { env: {} };
+  </script>
+
+  <!-- carrega o JS da raiz assim que o DOM existir -->
+  <script type="module">
+    const ensureRoot = () => {
+      let el = document.getElementById('root');
+      if (!el) { el = document.createElement('div'); el.id = 'root'; document.body.appendChild(el); }
+      el.innerHTML = ''; // React 18 exige container va
